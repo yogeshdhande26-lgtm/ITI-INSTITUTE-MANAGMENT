@@ -1,0 +1,674 @@
+{
+  "entities": {
+    "Instructor": {
+      "title": "Instructor",
+      "description": "An ITI Instructor",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name of the instructor" },
+        "email": { "type": "string", "format": "email", "description": "Official email address" },
+        "trade": { "type": "string", "description": "Trade/Department (e.g., Electrician, Fitter)" },
+        "qualification": { "type": "string", "description": "Educational qualification" },
+        "experience": { "type": "string", "description": "Years of experience" },
+        "phone": { "type": "string", "description": "Contact number" },
+        "joiningDate": { "type": "string", "format": "date", "description": "Date of joining ITI" },
+        "status": { "type": "string", "enum": ["Active", "Inactive"], "description": "Current employment status" },
+        "loginId": { "type": "string", "description": "Custom Login ID for the instructor" },
+        "password": { "type": "string", "description": "Login password" },
+        "uid": { "type": "string", "description": "Firebase Auth UID of the instructor (if they have login access)" },
+        "role": { "type": "string", "enum": ["admin", "instructor"], "description": "Role in the system" },
+        "customFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "value": { "type": "string" },
+              "type": { "type": "string", "enum": ["text", "textarea"] }
+            }
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "url": { "type": "string" },
+              "type": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["name", "email", "trade", "status"]
+    },
+    "User": {
+      "title": "User",
+      "description": "System user (Admin or Instructor)",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "instructor", "student"] },
+        "displayName": { "type": "string" },
+        "enabledFeatures": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of feature IDs enabled for this user"
+        }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "A student/trainee in the ITI",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "rollNo": { "type": "string" },
+        "trade": { "type": "string" },
+        "admissionDate": { "type": "string", "format": "date" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "instructorId": { "type": "string" },
+        "uid": { "type": "string", "description": "Firebase Auth UID of the student" },
+        "password": { "type": "string", "description": "Login password" },
+        "customFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "value": { "type": "string" },
+              "type": { "type": "string", "enum": ["text", "textarea"] }
+            }
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "url": { "type": "string" },
+              "type": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["name", "rollNo", "trade"]
+    },
+    "DailyDiary": {
+      "title": "Daily Diary",
+      "description": "Instructor's daily work diary",
+      "type": "object",
+      "properties": {
+        "instructorId": { "type": "string", "description": "UID of the instructor" },
+        "month": { "type": "string", "description": "Month of the diary entry" },
+        "weekNo": { "type": "string", "description": "Week number" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string" },
+              "day": { "type": "string" },
+              "lessonNo": { "type": "string" },
+              "theory": { "type": "string" },
+              "pracNo": { "type": "string" },
+              "pracName": { "type": "string" },
+              "other": { "type": "string" },
+              "remark": { "type": "string" }
+            }
+          }
+        },
+        "customFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "value": { "type": "string" },
+              "type": { "type": "string", "enum": ["text", "textarea"] }
+            }
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "url": { "type": "string" },
+              "type": { "type": "string" }
+            }
+          }
+        },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["instructorId", "month", "weekNo", "entries"]
+    },
+    "PracticalRecord": {
+      "title": "Practical Record",
+      "description": "Student practical record sheet",
+      "type": "object",
+      "properties": {
+        "instructorId": { "type": "string" },
+        "trade": { "type": "string" },
+        "practicalNo": { "type": "string" },
+        "module": { "type": "string" },
+        "date": { "type": "string" },
+        "studentName": { "type": "string" },
+        "rollNo": { "type": "string" },
+        "title": { "type": "string" },
+        "objective": { "type": "string" },
+        "tools": { "type": "string" },
+        "skill": { "type": "string" },
+        "procedure": { "type": "array", "items": { "type": "string" } },
+        "table": { "type": "array", "items": { "type": "array", "items": { "type": "string" } } },
+        "conclusion": { "type": "string" },
+        "precaution": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "customFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "value": { "type": "string" },
+              "type": { "type": "string", "enum": ["text", "textarea"] }
+            }
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "url": { "type": "string" },
+              "type": { "type": "string" }
+            }
+          }
+        },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["instructorId", "trade", "practicalNo", "title"]
+    },
+    "ExamForm": {
+      "title": "Exam Form",
+      "description": "AITT Examination Form",
+      "type": "object",
+      "properties": {
+        "instructorId": { "type": "string" },
+        "examSession": { "type": "string" },
+        "seatNo": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "surname": { "type": "string" },
+        "firstName": { "type": "string" },
+        "middleName": { "type": "string" },
+        "dob": { "type": "string" },
+        "gender": { "type": "string" },
+        "religion": { "type": "string" },
+        "caste": { "type": "string" },
+        "subcaste": { "type": "string" },
+        "trade": { "type": "string" },
+        "instituteName": { "type": "string" },
+        "subjects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "subject": { "type": "string" },
+              "subjectName": { "type": "string" },
+              "writtenMarks": { "type": "string" },
+              "sessionalMarks": { "type": "string" },
+              "examYear": { "type": "string" }
+            }
+          }
+        },
+        "address": { "type": "string" },
+        "city": { "type": "string" },
+        "district": { "type": "string" },
+        "taluka": { "type": "string" },
+        "pincode": { "type": "string" },
+        "totalPresentPercent": { "type": "string" },
+        "presentPercentJuly": { "type": "string" },
+        "syllabusCompleted": { "type": "string" },
+        "customFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "value": { "type": "string" },
+              "type": { "type": "string", "enum": ["text", "textarea"] }
+            }
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "url": { "type": "string" },
+              "type": { "type": "string" }
+            }
+          }
+        },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["instructorId", "surname", "firstName", "trade"]
+    },
+    "LessonPlan": {
+      "title": "Lesson Plan",
+      "description": "Technical Lesson Plan Register",
+      "type": "object",
+      "properties": {
+        "instructorId": { "type": "string" },
+        "institute": { "type": "string" },
+        "district": { "type": "string" },
+        "trade": { "type": "string" },
+        "lessonName": { "type": "string" },
+        "lessonNo": { "type": "string" },
+        "time": { "type": "string" },
+        "plannedDate": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["instructorId", "institute", "lessonName", "lessonNo"]
+    },
+    "DemoPlan": {
+      "title": "Demonstration Plan",
+      "description": "Technical Demonstration Plan Register",
+      "type": "object",
+      "properties": {
+        "instructorId": { "type": "string" },
+        "institute": { "type": "string" },
+        "district": { "type": "string" },
+        "trade": { "type": "string" },
+        "lessonName": { "type": "string" },
+        "lessonNo": { "type": "string" },
+        "time": { "type": "string" },
+        "plannedDate": { "type": "string" },
+        "instructorName": { "type": "string" },
+        "objectives": { "type": "string" },
+        "skills": { "type": "string" },
+        "tools": { "type": "string" },
+        "motivation": { "type": "string" },
+        "presentation": { "type": "string" },
+        "procedures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "procedure": { "type": "string" },
+              "infoPoints": { "type": "string" },
+              "spotHints": { "type": "string" }
+            }
+          }
+        },
+        "result": { "type": "string" },
+        "summary": { "type": "string" },
+        "studentInvolvement": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["instructorId", "institute", "lessonName", "lessonNo"]
+    },
+    "MonthlyAssessment": {
+      "title": "Monthly Internal Assessment",
+      "description": "Trainee's Monthly Internal Assessment Register",
+      "type": "object",
+      "properties": {
+        "instructorId": { "type": "string" },
+        "institute": { "type": "string" },
+        "trade": { "type": "string" },
+        "trainee": { "type": "string" },
+        "year": { "type": "string" },
+        "marks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "month": { "type": "string" },
+              "safety": { "type": "number" },
+              "discipline": { "type": "number" },
+              "workshop": { "type": "number" },
+              "knowledge": { "type": "number" },
+              "skill": { "type": "number" },
+              "total": { "type": "number" },
+              "percent": { "type": "number" },
+              "result": { "type": "string" }
+            }
+          }
+        },
+        "annualSummary": {
+          "type": "object",
+          "properties": {
+            "grandTotal": { "type": "number" },
+            "averagePercent": { "type": "number" },
+            "finalResult": { "type": "string" }
+          }
+        },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["instructorId", "trainee", "trade"]
+    },
+    "InternalAssessment": {
+      "title": "Internal Assessment",
+      "description": "Enhanced Format for Internal Assessment",
+      "type": "object",
+      "properties": {
+        "instructorId": { "type": "string" },
+        "assessor": { "type": "string" },
+        "year": { "type": "string" },
+        "iti": { "type": "string" },
+        "date": { "type": "string" },
+        "industry": { "type": "string" },
+        "location": { "type": "string" },
+        "trade": { "type": "string" },
+        "semester": { "type": "string" },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sr": { "type": "number" },
+              "name": { "type": "string" },
+              "fatherName": { "type": "string" },
+              "safety": { "type": "number" },
+              "hygiene": { "type": "number" },
+              "punctuality": { "type": "number" },
+              "manuals": { "type": "number" },
+              "knowledge": { "type": "number" },
+              "tools": { "type": "number" },
+              "materials": { "type": "number" },
+              "speed": { "type": "number" },
+              "quality": { "type": "number" },
+              "viva": { "type": "number" },
+              "total": { "type": "number" },
+              "result": { "type": "string" }
+            }
+          }
+        },
+        "columnTotals": {
+          "type": "object",
+          "properties": {
+            "safetyTotal": { "type": "number" },
+            "vivaTotal": { "type": "number" }
+          }
+        },
+        "grandSummary": {
+          "type": "object",
+          "properties": {
+            "grandTotal": { "type": "number" },
+            "totalPass": { "type": "number" },
+            "totalFail": { "type": "number" }
+          }
+        },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["instructorId", "trade", "semester"]
+    },
+    "MonthlyPlan": {
+      "title": "Monthly Plan",
+      "description": "Enhanced Monthly Plan Register",
+      "type": "object",
+      "properties": {
+        "instructorId": { "type": "string" },
+        "institute": { "type": "string" },
+        "trade": { "type": "string" },
+        "month": { "type": "string" },
+        "year": { "type": "string" },
+        "weeks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sr": { "type": "number" },
+              "weekDates": { "type": "string" },
+              "lessonNo": { "type": "string" },
+              "theory": { "type": "string" },
+              "practical": { "type": "string" },
+              "material": { "type": "string" },
+              "remark": { "type": "string" }
+            }
+          }
+        },
+        "lessonTotal": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["instructorId", "month", "year", "trade"]
+    },
+    "YearlyPlan": {
+      "title": "Yearly Plan",
+      "description": "Enhanced Yearly Plan Register",
+      "type": "object",
+      "properties": {
+        "instructorId": { "type": "string" },
+        "institute": { "type": "string" },
+        "trade": { "type": "string" },
+        "year": { "type": "string" },
+        "instructorName": { "type": "string" },
+        "monthlyData": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "month": { "type": "string" },
+              "theory": { "type": "number" },
+              "practical": { "type": "number" },
+              "remark": { "type": "string" }
+            }
+          }
+        },
+        "holidays": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string" },
+              "name": { "type": "string" },
+              "type": { "type": "string", "enum": ["Holiday", "Working"] }
+            }
+          }
+        },
+        "yearTotal": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["instructorId", "year", "trade"]
+    },
+    "LessonPlan": {
+      "title": "Lesson Plan",
+      "description": "Technical Lesson Plan Register",
+      "type": "object",
+      "properties": {
+        "instructorId": { "type": "string" },
+        "institute": { "type": "string" },
+        "instructorName": { "type": "string" },
+        "trade": { "type": "string" },
+        "batch": { "type": "string" },
+        "lessonName": { "type": "string" },
+        "lessonNo": { "type": "string" },
+        "duration": { "type": "number" },
+        "durationUnit": { "type": "string", "enum": ["minutes", "hours"] },
+        "plannedDate": { "type": "string" },
+        "procedures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sr": { "type": "number" },
+              "procedure": { "type": "string" },
+              "information": { "type": "string" },
+              "visual": { "type": "string" }
+            }
+          }
+        },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["instructorId", "lessonName", "trade"]
+    },
+    "CustomForm": {
+      "title": "Custom Form",
+      "description": "User-defined dynamic form structure",
+      "type": "object",
+      "properties": {
+        "instructorId": { "type": "string" },
+        "name": { "type": "string" },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string", "enum": ["text", "number", "date", "file"] }
+            }
+          }
+        },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["instructorId", "name", "fields"]
+    },
+    "CustomFormEntry": {
+      "title": "Custom Form Entry",
+      "description": "Data entry for a user-defined dynamic form",
+      "type": "object",
+      "properties": {
+        "formId": { "type": "string" },
+        "instructorId": { "type": "string" },
+        "data": { "type": "object" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["formId", "instructorId", "data"]
+    },
+    "AdvancedForm": {
+      "title": "Advanced Form Builder Pro",
+      "description": "Professional multi-column form structure with conditional logic",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "structure": { "type": "array" },
+        "settings": { "type": "object" },
+        "instructorId": { "type": "string" },
+        "createdAt": { "type": "object" },
+        "updatedAt": { "type": "object" }
+      },
+      "required": ["name", "structure", "instructorId"]
+    },
+    "AdvancedFormEntry": {
+      "title": "Advanced Form Entry",
+      "description": "Data submission for an Advanced Form",
+      "type": "object",
+      "properties": {
+        "formId": { "type": "string" },
+        "instructorId": { "type": "string" },
+        "data": { "type": "object" },
+        "submittedBy": { "type": "object" },
+        "createdAt": { "type": "object" }
+      },
+      "required": ["formId", "instructorId", "data", "submittedBy"]
+    },
+    "SystemConfig": {
+      "title": "System Configuration",
+      "description": "Global application settings and customization",
+      "type": "object",
+      "properties": {
+        "appName": { "type": "string", "description": "The name of the application" },
+        "themeColor": { "type": "string", "description": "Global theme color" },
+        "menuItems": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "enabled": { "type": "boolean" },
+              "icon": { "type": "string" },
+              "isCustom": { "type": "boolean" }
+            }
+          }
+        },
+        "logoUrl": { "type": "string", "description": "URL to the application logo" }
+      }
+    }
+  },
+  "firestore": {
+    "/instructors/{instructorId}": {
+      "schema": "Instructor",
+      "description": "Collection of instructors"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "System users and their roles"
+    },
+    "/login_mappings/{loginId}": {
+      "schema": "object",
+      "description": "Maps custom Login IDs to instructor emails"
+    },
+    "/daily_diaries/{diaryId}": {
+      "schema": "DailyDiary",
+      "description": "Collection of daily diary entries"
+    },
+    "/practical_records/{recordId}": {
+      "schema": "PracticalRecord",
+      "description": "Collection of practical record sheets"
+    },
+    "/exam_forms/{formId}": {
+      "schema": "ExamForm",
+      "description": "Collection of AITT examination forms"
+    },
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Collection of students"
+    },
+    "/lesson_plans/{planId}": {
+      "schema": "LessonPlan",
+      "description": "Collection of lesson plans"
+    },
+    "/demo_plans/{planId}": {
+      "schema": "DemoPlan",
+      "description": "Collection of demonstration plans"
+    },
+    "/monthly_assessments/{assessmentId}": {
+      "schema": "MonthlyAssessment",
+      "description": "Collection of monthly internal assessments"
+    },
+    "/internal_assessments/{assessmentId}": {
+      "schema": "InternalAssessment",
+      "description": "Collection of enhanced internal assessments"
+    },
+    "/monthly_plans/{planId}": {
+      "schema": "MonthlyPlan",
+      "description": "Collection of monthly plans"
+    },
+    "/yearly_plans/{planId}": {
+      "schema": "YearlyPlan",
+      "description": "Collection of yearly plans"
+    },
+    "/advanced_forms/{formId}": {
+      "schema": "AdvancedForm",
+      "description": "Professional custom forms"
+    },
+    "/advanced_form_entries/{entryId}": {
+      "schema": "AdvancedFormEntry",
+      "description": "Submissions for advanced forms"
+    },
+    "/system/{docId}": {
+      "schema": "SystemConfig",
+      "description": "Global application configuration"
+    }
+  }
+}
